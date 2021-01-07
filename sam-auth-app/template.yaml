@@ -15,6 +15,12 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      Auth:
+          DefaultAuthorizer: ClockFunctionAuthorizer
+          Authorizers:
+            ClockFunctionAuthorizer:
+              FunctionArn: !GetAtt AuthTokenFunction.Arn
+
      
   ClockFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -29,6 +35,14 @@ Resources:
             RestApiId: !Ref ClockApi
             Path: /clock
             Method: get
+
+  AuthTokenFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: authorizer/
+      Handler: auth.authorizer
+      Runtime: nodejs12.x
+
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
